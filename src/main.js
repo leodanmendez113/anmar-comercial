@@ -1,16 +1,16 @@
 import './styles/base.css'
 import './styles/comercial.css'
-import { WHATSAPP, WHATSAPP_MENSAJE, PORTAFOLIO } from './config.js'
+import { PORTAFOLIO } from './config.js'
+import { cargarContacto, aplicarContacto, linkWhatsApp } from './contacto.js'
 
 const $ = (sel) => document.querySelector(sel)
 const $$ = (sel) => [...document.querySelectorAll(sel)]
 const dinero = (n) => '$' + Math.round(n).toLocaleString('en-US')
 const escapar = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
-const linkWhatsApp = (texto) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`
 
 $('[data-anio]').textContent = new Date().getFullYear()
-$$('[data-whatsapp]').forEach((a) => (a.href = linkWhatsApp(WHATSAPP_MENSAJE)))
+aplicarContacto()
 $$('[data-portafolio]').forEach((a) => (a.href = PORTAFOLIO))
 
 // Paquetes que maneja el admin (/datos/precios-comercial.json).
@@ -58,4 +58,4 @@ function revelar() {
   $$('.revelar').forEach((el) => { el.classList.add('oculto'); obs.observe(el) })
 }
 
-cargarPaquetes().then((p) => { pintarPaquetes(p); revelar() })
+Promise.all([cargarPaquetes(), cargarContacto()]).then(([p]) => { aplicarContacto(); pintarPaquetes(p); revelar() })
